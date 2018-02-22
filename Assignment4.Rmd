@@ -1,0 +1,167 @@
+---
+title: "Assignment4"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tibble)
+library(ggplot2)
+library(dplyr)
+library(tidyverse)
+```
+
+# 10.5 Exercise
+
+## 1 How can you tell if an object is a tibble? 
+##(Hint: try printing mtcars, which is a regular data frame).
+```{r}
+mtcars
+class(mtcars)
+class(as_tibble(mtcars))
+```
+
+## 2 Compare and contrast the following operations on a data.frame and equivalent tibble. What is different? Why might the default data frame behaviours cause you frustration?
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+```{r}
+#data.frame
+df <- data.frame(abc = 1, xyz = "a")
+
+#tibble
+tbl <- as.tibble(df)
+
+df$x
+tbl$x
+
+df[, "xyz"]
+tbl[,"xyz"]
+
+df[, c("abc", "xyz")]
+tbl[,c("abc","xyz")]
+
+```
+- Difference 1
+Using $ a data.frame will partially complete the column. So even though we wrote df$x it returned df$xyz. The advantage is it sometimes can save a few keystrokes, but on the otherside, it can result in accidentally using a different variable than you thought you were using.
+
+- Difference 2
+With data.frames, with [ the type of object that is returned differs on the number of columns. If it is one column, it won’t return a data.frame, but instead will return a vector. With more than one column, then it will return a data.frame. 
+
+## 3 If you have the name of a variable stored in an object, e.g. var <- "mpg", how can you extract the reference variable from a tibble?
+
+df[[var]]
+
+## 4 Practice referring to non-syntactic names in the following data frame by:
+```{r}
+annoying <- tibble(
+  `1` = 1:10,
+  `2` = `1` * 2 + rnorm(length(`1`))
+)
+
+annoying
+
+#(1)Extracting the variable called 1.
+annoying[1]
+annoying[["1"]]
+annoying$'1'
+
+#(2)Plotting a scatterplot of 1 vs 2.
+plot(annoying)
+ggplot(annoying, aes(x = `1`, y = `2`)) +geom_point()
+
+#(3)Creating a new column called 3 which is 2 divided by 1.
+annoying$`3` <- annoying$`2` / annoying$`1`
+annoying[["3"]] <- annoying[["2"]] / annoying[["1"]]
+
+
+#(4)Renaming the columns to one, two and three.
+annoying <- rename(annoying, one = `1`, two = `2`, three = `3`)
+glimpse(annoying)
+```
+
+# 5 What does tibble::enframe() do? When might you use it?
+```{r}
+?enframe()
+enframe(c(a = 5, b = 7, c=25))
+```
+enframe() converts named atomic vectors or lists to two-column data frames. For unnamed vectors, the natural sequence is used as name column.
+
+# 6 What option controls how many additional column names are printed at the footer of a tibble?
+```{r}
+?print.tbl_df()
+```
+The print function for tibbles is in print.tbl_df:
+n_extra	: Number of extra columns to print abbreviated information for, if the width is too small for the entire tibble. If NULL, the default, will print information about at most tibble.max_extra_cols extra columns
+
+
+## 12.6.1 Exercise
+
+```{r}
+who
+
+who1 <- who %>%
+  gather(new_sp_m014:newrel_f65, key = "key", value = "cases", na.rm = TRUE)
+glimpse(who1)
+who1
+
+who2 <- who1 %>%
+ mutate(key = stringr::str_replace(key, "newrel", "new_rel"))
+who2
+
+who3 <- who2 %>%
+  separate(key, c("new", "type", "sexage"), sep = "_")
+who3
+
+who3 %>%
+  count(new)
+
+who4 <- who3 %>%
+  select(-new, -iso2, -iso3)
+
+who5 <- who4 %>%
+  separate(sexage, c("sex", "age"), sep = 1)
+who5
+```
+
+#1 In this case study I set na.rm = TRUE just to make it easier to check that we had the correct values. Is this reasonable? Think about how missing values are represented in this dataset. Are there implicit missing values? What’s the difference between an NA and zero?
+
+```{r}
+who1 %>%
+  filter(cases == 0) %>%
+  nrow()
+```
+Yes, I think it is reasonable. Because there are zero’s in the data, which means they may explicitly be indicating no cases. As for those values with NA values, they can either be really non-missing or be treated as non-missing by the data collecter. So if we treat explicity and implicity missing values the same, we won't lose any information by dropping them.
+
+#2 What happens if you neglect the mutate() step? (mutate(key = stringr::str_replace(key, "newrel", "new_rel")))
+```{r}
+who3a <- who1 %>%
+  separate(key, c("new", "type", "sexage"), sep = "_")
+```
+separate causes the warning message saying the values are too few 
+```{r}
+filter(who3a, new == "newrel") %>% head()
+```
+if we check the rows for keys beginning with "newrel_", we see that sexage is messing, and type = m014.
+
+#3 I claimed that iso2 and iso3 were redundant with country. Confirm this claim.
+```{r}
+select(who3, country, iso2, iso3) %>%
+  distinct() %>%
+  group_by(country) %>%
+  filter(n() > 1)
+```
+
+#4 For each country, year, and sex compute the total number of cases of TB. Make an informative visualization of the data.
+```{r}
+who5 %>%
+  group_by(country, year, sex) %>%
+  filter(year > 1995) %>%
+  summarise(cases = sum(cases)) %>%
+  unite(country_sex, country, sex, remove = FALSE) %>%
+  ggplot(aes(x = year, y = cases, group = country_sex, colour = sex)) +
+  geom_line()
+
+```
+
