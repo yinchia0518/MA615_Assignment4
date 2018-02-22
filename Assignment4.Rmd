@@ -132,7 +132,11 @@ who1 %>%
   filter(cases == 0) %>%
   nrow()
 ```
-Yes, I think it is reasonable. Because there are zero’s in the data, which means they may explicitly be indicating no cases. As for those values with NA values, they can either be really non-missing or be treated as non-missing by the data collecter. So if we treat explicity and implicity missing values the same, we won't lose any information by dropping them.
+Yes, I think it is reasonable. 
+Because the rows with the missing values(NA)were redundant as they were not giving any useful information. These missing values may either were inserted explicitily by whoever created the dataset, or they were really missing values. 
+The main difference between NA and 0 is that 0 is an actual value indicating that there were no cases of tubercolosis in a country in a given year, whereas a NA value tells us we have no information on the observation at all.
+
+And after we set the na.rm=TRUE to all the data (treat them the same), the explicitly and implicitly missing values are not displayed in who1. And this is reasonable because if we removed all the missing values(including explicitly and implicitly) from the data set, we will have fewer data to analyze. 
 
 #2 What happens if you neglect the mutate() step? (mutate(key = stringr::str_replace(key, "newrel", "new_rel")))
 ```{r}
