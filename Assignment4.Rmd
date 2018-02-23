@@ -9,6 +9,7 @@ library(tibble)
 library(ggplot2)
 library(dplyr)
 library(tidyverse)
+library(tidyr)
 ```
 
 # 10.5 Exercise
@@ -81,14 +82,14 @@ annoying <- rename(annoying, one = `1`, two = `2`, three = `3`)
 glimpse(annoying)
 ```
 
-# 5 What does tibble::enframe() do? When might you use it?
+## 5 What does tibble::enframe() do? When might you use it?
 ```{r}
 ?enframe()
 enframe(c(a = 5, b = 7, c=25))
 ```
 enframe() converts named atomic vectors or lists to two-column data frames. For unnamed vectors, the natural sequence is used as name column.
 
-# 6 What option controls how many additional column names are printed at the footer of a tibble?
+## 6 What option controls how many additional column names are printed at the footer of a tibble?
 ```{r}
 ?print.tbl_df()
 ```
@@ -96,7 +97,7 @@ The print function for tibbles is in print.tbl_df:
 n_extra	: Number of extra columns to print abbreviated information for, if the width is too small for the entire tibble. If NULL, the default, will print information about at most tibble.max_extra_cols extra columns
 
 
-## 12.6.1 Exercise
+# 12.6.1 Exercise
 
 ```{r}
 who
@@ -125,7 +126,7 @@ who5 <- who4 %>%
 who5
 ```
 
-#1 In this case study I set na.rm = TRUE just to make it easier to check that we had the correct values. Is this reasonable? Think about how missing values are represented in this dataset. Are there implicit missing values? What’s the difference between an NA and zero?
+##1 In this case study I set na.rm = TRUE just to make it easier to check that we had the correct values. Is this reasonable? Think about how missing values are represented in this dataset. Are there implicit missing values? What’s the difference between an NA and zero?
 
 ```{r}
 who1 %>%
@@ -138,7 +139,7 @@ The main difference between NA and 0 is that 0 is an actual value indicating tha
 
 And after we set the na.rm=TRUE to all the data (treat them the same), the explicitly and implicitly missing values are not displayed in who1. And this is reasonable because if we removed all the missing values(including explicitly and implicitly) from the data set, we will have fewer data to analyze. 
 
-#2 What happens if you neglect the mutate() step? (mutate(key = stringr::str_replace(key, "newrel", "new_rel")))
+##2 What happens if you neglect the mutate() step? (mutate(key = stringr::str_replace(key, "newrel", "new_rel")))
 ```{r}
 who3a <- who1 %>%
   separate(key, c("new", "type", "sexage"), sep = "_")
@@ -149,7 +150,7 @@ filter(who3a, new == "newrel") %>% head()
 ```
 if we check the rows for keys beginning with "newrel_", we see that sexage is messing, and type = m014.
 
-#3 I claimed that iso2 and iso3 were redundant with country. Confirm this claim.
+##3 I claimed that iso2 and iso3 were redundant with country. Confirm this claim.
 ```{r}
 select(who3, country, iso2, iso3) %>%
   distinct() %>%
@@ -157,7 +158,7 @@ select(who3, country, iso2, iso3) %>%
   filter(n() > 1)
 ```
 
-#4 For each country, year, and sex compute the total number of cases of TB. Make an informative visualization of the data.
+##4 For each country, year, and sex compute the total number of cases of TB. Make an informative visualization of the data.
 ```{r}
 who5 %>%
   group_by(country, year, sex) %>%
@@ -166,6 +167,12 @@ who5 %>%
   unite(country_sex, country, sex, remove = FALSE) %>%
   ggplot(aes(x = year, y = cases, group = country_sex, colour = sex)) +
   geom_line()
+
+```
+
+#Tidy Data article:
+##1 table 4 -> table 6
+```{r}
 
 ```
 
