@@ -1,5 +1,5 @@
 ---
-title: "Assignment4"
+title: "Assignment4_10.5&12.6"
 output: pdf_document
 ---
 
@@ -10,6 +10,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyverse)
 library(tidyr)
+library(foreign)
 ```
 
 # 10.5 Exercise
@@ -170,9 +171,4 @@ who5 %>%
 
 ```
 
-#Tidy Data article:
-##1 table 4 -> table 6
-```{r}
-
-```
 
