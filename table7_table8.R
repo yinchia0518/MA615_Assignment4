@@ -27,11 +27,15 @@ table7$track[long_name] <- paste0(substr(table7$track[long_name], 0, 20), "...")
 
 table7.1 <- table7%>%gather(key="week",value="rank",-year,-artist,-track,-time,-date.entered)
 
-table7.2<- table7.1%>%arrange(artist)
+table7.2<- table7.1%>%arrange(artist,track)
 
 table7.3<- table7.2%>%filter(!is.na(rank))
 
-table7.4<- table7.3%>% select(year,artist,time,track,date.entered,week,rank)
+table7.4 <- table7.3 %>%   separate(week, c("wk", "week"), sep = 2)
 
-table8 <- table7.4
+table7.5 <- table7.4 %>% select(- wk)
+
+table7.6<- table7.5%>% select(year,artist,time,track,date.entered,week,rank)
+
+table8 <- table7.6
 
