@@ -97,12 +97,9 @@ m
 n <- enframe(c(a = 1, b = 2,c=3))
 n
 
-?list()
-
-
 ```
 enframe() converts named atomic vectors or lists to two-column data frames. For unnamed vectors, the natural sequence is used as name column.
-The advantage is we can keep the original lists or data frames, but still create tibbles using them. So if I want to keep the backwards compatibility with data frames and list, but still need tibbles, I will use this enframe.
+The advantage is that we can keep the original lists or data frames, but still create tibbles using them. So if I want to keep the backwards compatibility with data frames and list, but still need tibbles, I will use enframe().
 
 ## 6 What option controls how many additional column names are printed at the footer of a tibble?
 ```{r}
