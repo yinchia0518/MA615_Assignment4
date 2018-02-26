@@ -37,5 +37,9 @@ table7.5 <- table7.4 %>% select(- wk)
 
 table7.6<- table7.5%>% select(year,artist,time,track,date.entered,week,rank)
 
-table8 <- table7.6
+table7.7 <- dplyr::rename(table7.6, date = date.entered)
+
+table7.8<- table7.7%>%mutate(date = as.Date(date) + days(week) * 7 - days(7))
+
+table8 <- table7.8
 
